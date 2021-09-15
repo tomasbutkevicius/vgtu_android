@@ -1,4 +1,0 @@
-#Wed Sep 15 17:38:38 EEST 2021
-base.0=/Users/tomas/Developer/VGTU/ismanieji irenginiai/flutter/build/app/intermediates/dex/debug/mergeDexDebug/classes.dex
-path.0=classes.dex
-renamed.0=classes.dex
