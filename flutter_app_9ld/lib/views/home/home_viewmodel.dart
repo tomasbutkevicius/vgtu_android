@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:positioned_tap_detector_2/positioned_tap_detector_2.dart';
 
 class HomeViewModel extends StateManager {
   final State _state;
@@ -71,16 +72,38 @@ class HomeViewModel extends StateManager {
     if (pointIndex >= points.length) {
       pointIndex = 0;
     }
-    setState(() {
-      markers[0] = Marker(
-        point: points[pointIndex],
-        anchorPos: AnchorPos.align(AnchorAlign.center),
-        height: 30,
-        width: 30,
-        builder: (ctx) => Icon(Icons.pin_drop),
-      );
-      markers = List.from(markers);
-    });
+    markers[0] = Marker(
+      point: points[pointIndex],
+      anchorPos: AnchorPos.align(AnchorAlign.center),
+      height: 30,
+      width: 30,
+      builder: (ctx) => Icon(Icons.pin_drop),
+    );
+    markers = List.from(markers);
+    rebuildWidget(_state);
+  }
+
+  onPopupTap() {
+    debugPrint('Popup tap!');
+  }
+
+  onMapLongPress(TapPosition position, LatLng point) {
+    print("long press");
+    print("latitude");
+    print(point.latitude);
+    Marker newMarker = Marker(
+      anchorPos: AnchorPos.align(AnchorAlign.center),
+      height: 30,
+      width: 30,
+      point: point,
+      builder: (ctx) => Icon(Icons.pin_drop),
+    );
+    markers.add(newMarker);
+    rebuildWidget(_state);
+  }
+
+  onMapTap(TapPosition position, LatLng point) {
+    popupController.hidePopup();
   }
 
 }

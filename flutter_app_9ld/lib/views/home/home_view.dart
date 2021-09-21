@@ -35,14 +35,8 @@ class _HomeViewState extends State<HomeView> {
           plugins: [
             MarkerClusterPlugin(),
           ],
-          onTap: (position, point) {
-            viewModel.popupController.hidePopup();
-          } ,
-          onLongPress: (position, point){
-            print("long press");
-            print("latitude");
-            print(point.latitude);
-          }
+          onTap: (position, point) => viewModel.onMapTap(position, point),
+          onLongPress: (position, point) => viewModel.onMapLongPress(position, point),
         ),
         layers: [
           TileLayerOptions(
@@ -69,7 +63,7 @@ class _HomeViewState extends State<HomeView> {
                   height: 100,
                   color: Colors.white,
                   child: GestureDetector(
-                    onTap: () => debugPrint('Popup tap!'),
+                    onTap: () => viewModel.onPopupTap(),
                     child: Text(
                       'Double tap to remove ${marker.point}',
                     ),
