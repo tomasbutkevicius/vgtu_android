@@ -22,63 +22,92 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => viewModel.onRefreshBtnClick(),
-        child: Icon(Icons.refresh),
-      ),
-      body: FlutterMap(
-        mapController: viewModel.mapController,
-        options: MapOptions(
-          center: viewModel.points[0],
-          zoom: 5,
-          maxZoom: 15,
-          plugins: [
-            MarkerClusterPlugin(),
-          ],
-          onTap: (position, point) => viewModel.onMapTap(position, point),
-          onLongPress: (position, point) => viewModel.onMapLongPress(position, point),
-        ),
-        layers: [
-          TileLayerOptions(
-            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            subdomains: ['a', 'b', 'c'],
-          ),
-          MarkerClusterLayerOptions(
-            maxClusterRadius: 120,
-            size: Size(40, 40),
-            anchor: AnchorPos.align(AnchorAlign.center),
-            fitBoundsOptions: FitBoundsOptions(
-              padding: EdgeInsets.all(50),
-            ),
-            markers: viewModel.markers,
-            polygonOptions: PolygonOptions(
-                borderColor: Colors.blueAccent,
-                color: Colors.black12,
-                borderStrokeWidth: 3),
-            popupOptions: PopupOptions(
-                popupSnap: PopupSnap.markerTop,
-                popupController: viewModel.popupController,
-                popupBuilder: (_, marker) => Container(
-                  width: 200,
-                  height: 100,
-                  color: Colors.white,
-                  child: GestureDetector(
-                    onTap: () => viewModel.onPopupTap(),
-                    onDoubleTap: () => viewModel.onPopupDoubleTap(marker),
-                    child: Text(
-                      '${viewModel.popupMessage} ${marker.point}',
-                    ),
-                  ),
-                )),
-            builder: (context, markers) {
-              return FloatingActionButton(
-                onPressed: null,
-                child: Text(markers.length.toString()),
-              );
-            },
-          ),
+      appBar: _buildAppBar(context),
+      floatingActionButton: _buildBottomActionButtons(),
+      body: _buildBody(),
+    );
+  }
+
+  FlutterMap _buildBody() {
+    return FlutterMap(
+      mapController: viewModel.mapController,
+      options: MapOptions(
+        center: viewModel.centerPoint,
+        zoom: 5,
+        maxZoom: 15,
+        plugins: [
+          MarkerClusterPlugin(),
         ],
+        onTap: (position, point) => viewModel.onMapTap(position, point),
+        onLongPress: (position, point) => viewModel.onMapLongPress(position, point),
       ),
+      layers: [
+        TileLayerOptions(
+          urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          subdomains: ['a', 'b', 'c'],
+        ),
+        MarkerClusterLayerOptions(
+          maxClusterRadius: 120,
+          size: Size(40, 40),
+          anchor: AnchorPos.align(AnchorAlign.center),
+          fitBoundsOptions: const FitBoundsOptions(
+            padding: EdgeInsets.all(50),
+          ),
+          markers: viewModel.markers,
+          polygonOptions: PolygonOptions(borderColor: Colors.blueAccent, color: Colors.black12, borderStrokeWidth: 3),
+          popupOptions: PopupOptions(
+              popupSnap: PopupSnap.markerTop,
+              popupController: viewModel.popupController,
+              popupBuilder: (_, marker) => Container(
+                    width: 150,
+                    height: 50,
+                    color: Colors.white,
+                    child: GestureDetector(
+                      onTap: () => viewModel.onPopupTap(),
+                      onDoubleTap: () => viewModel.onPopupDoubleTap(marker),
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          primary: Colors.white,
+                          backgroundColor: Colors.teal,
+                          onSurface: Colors.grey,
+                        ),
+                        onPressed: () {},
+                        child: Text(viewModel.popupMessage),
+                      ),
+                    ),
+                  )),
+          builder: (context, markers) {
+            return FloatingActionButton(
+              onPressed: null,
+              child: Text(markers.length.toString()),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  FloatingActionButton _buildBottomActionButtons() {
+    return FloatingActionButton(
+      onPressed: () => viewModel.onRefreshBtnClick(),
+      child: const Icon(Icons.save),
+    );
+  }
+
+  AppBar _buildAppBar(BuildContext context) {
+    const TextStyle infoBtnTextStyle = TextStyle(color: Colors.white);
+    return AppBar(
+      title: const Text("Personal Marker Map"),
+      centerTitle: true,
+      actions: [
+        TextButton(
+          onPressed: () => viewModel.onInfoClick(context),
+          child: Text(
+            viewModel.infoBtnText,
+            style: infoBtnTextStyle,
+          ),
+        )
+      ],
     );
   }
 }

@@ -9,16 +9,20 @@ import 'package:positioned_tap_detector_2/positioned_tap_detector_2.dart';
 
 class HomeViewModel extends StateManager {
   final State _state;
-  late final LocalStorage _localStorage;
-  final String popupMessage = "Double tap here to remove";
+  late final LocalStorage _localStorage;  
   final PopupController popupController = PopupController();
   final MapController mapController = MapController();
+  
+  final String popupMessage = "Remove (2x tap)";
+  final String snackBarInformation = 'Long press on map to add marker\n'
+      'Press bottom button to save\n'
+      'Click on marker for more information';
+  final String infoBtnText = "info";
+
+
   List<Marker> markers = [];
   late int pointIndex;
-  List points = [
-    LatLng(51.5, -0.09),
-    LatLng(49.8566, 3.3522),
-  ];
+  LatLng centerPoint = LatLng(55.393086, 22.734465);
 
   HomeViewModel(this._state) {
     _initializeHomeView();
@@ -27,8 +31,16 @@ class HomeViewModel extends StateManager {
   Future _initializeHomeView() async {
      _localStorage = LocalStorage();
     pointIndex = 0;
+    centerPoint = await _localStorage.getCenterPoint();
+    mapController.move(centerPoint, 5);
     markers =  await _localStorage.getMarkers();
     rebuildWidget(_state);
+  }
+
+  onInfoClick(BuildContext context) {
+    final snackBar = SnackBar(content: Text(snackBarInformation));
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   onRefreshBtnClick() {
@@ -40,9 +52,11 @@ class HomeViewModel extends StateManager {
     debugPrint('Popup tap!');
   }
 
-  onMapLongPress(TapPosition position, LatLng point) {
-    print("long press. Adding a marker...");
-    print(point.latitude);
+  onMapLongPress(TapPosition position, LatLng point) async {
+    print("VM: long press. Adding a marker...");
+    print(point);
+    centerPoint = point;
+    await _localStorage.saveCenterPoint(point);
     Marker newMarker = Marker(
       anchorPos: AnchorPos.align(AnchorAlign.center),
       height: 30,
@@ -64,6 +78,7 @@ class HomeViewModel extends StateManager {
     markers.removeWhere((element) => (element.point.latitude == marker.point.latitude && element.point.longitude == marker.point.longitude));
 
     markers = List.from(markers);
+    popupController.hidePopup();
 
     rebuildWidget(_state);
   }
