@@ -64,8 +64,9 @@ class _HomeViewState extends State<HomeView> {
                   color: Colors.white,
                   child: GestureDetector(
                     onTap: () => viewModel.onPopupTap(),
+                    onDoubleTap: () => viewModel.onPopupDoubleTap(marker),
                     child: Text(
-                      'Double tap to remove ${marker.point}',
+                      '${viewModel.popupMessage} ${marker.point}',
                     ),
                   ),
                 )),

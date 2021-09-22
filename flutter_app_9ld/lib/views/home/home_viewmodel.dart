@@ -8,6 +8,7 @@ import 'package:positioned_tap_detector_2/positioned_tap_detector_2.dart';
 
 class HomeViewModel extends StateManager {
   final State _state;
+  final String popupMessage = "Double tap here to remove";
   final PopupController popupController = PopupController();
   final MapController mapController = MapController();
   late List<Marker> markers;
@@ -20,48 +21,7 @@ class HomeViewModel extends StateManager {
   HomeViewModel(this._state) {
     pointIndex = 0;
     markers = [
-      Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
-        height: 30,
-        width: 30,
-        point: points[pointIndex],
-        builder: (ctx) => Icon(Icons.pin_drop),
-      ),
-      Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
-        height: 30,
-        width: 30,
-        point: LatLng(53.3498, -6.2603),
-        builder: (ctx) => Icon(Icons.pin_drop),
-      ),
-      Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
-        height: 30,
-        width: 30,
-        point: LatLng(53.3488, -6.2613),
-        builder: (ctx) => Icon(Icons.pin_drop),
-      ),
-      Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
-        height: 30,
-        width: 30,
-        point: LatLng(53.3488, -6.2613),
-        builder: (ctx) => Icon(Icons.pin_drop),
-      ),
-      Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
-        height: 30,
-        width: 30,
-        point: LatLng(48.8566, 2.3522),
-        builder: (ctx) => Icon(Icons.pin_drop),
-      ),
-      Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
-        height: 30,
-        width: 30,
-        point: LatLng(49.8566, 3.3522),
-        builder: (ctx) => Icon(Icons.pin_drop),
-      ),
+
     ];
     rebuildWidget(_state);
   }
@@ -88,8 +48,7 @@ class HomeViewModel extends StateManager {
   }
 
   onMapLongPress(TapPosition position, LatLng point) {
-    print("long press");
-    print("latitude");
+    print("long press. Adding a marker...");
     print(point.latitude);
     Marker newMarker = Marker(
       anchorPos: AnchorPos.align(AnchorAlign.center),
@@ -99,11 +58,21 @@ class HomeViewModel extends StateManager {
       builder: (ctx) => Icon(Icons.pin_drop),
     );
     markers.add(newMarker);
+
+    markers = List.from(markers);
     rebuildWidget(_state);
   }
 
   onMapTap(TapPosition position, LatLng point) {
     popupController.hidePopup();
+  }
+
+  onPopupDoubleTap(Marker marker) {
+    markers.removeWhere((element) => (element.point.latitude == marker.point.latitude && element.point.longitude == marker.point.longitude));
+
+    markers = List.from(markers);
+
+    rebuildWidget(_state);
   }
 
 }
