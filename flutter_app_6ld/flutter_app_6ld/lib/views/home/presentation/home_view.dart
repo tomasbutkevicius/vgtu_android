@@ -19,92 +19,113 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    return _buildHomeView();
+    return _buildHomeView(context);
   }
 
-  Widget _buildHomeView() {
+  Widget _buildHomeView(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(context, viewModel.title),
-      body: _buildBody(),
+      body: _buildBody(context),
     );
   }
 
   AppBar _buildAppBar(BuildContext context, String title) {
     return AppBar(
-      actions: _buildAppBarActions(context),
       title: Text(title),
     );
   }
 
-  List<Widget> _buildAppBarActions(BuildContext context) {
-    return [_buildPopupMenu(context)];
-  }
-
-  PopupMenuButton<int> _buildPopupMenu(BuildContext context) {
-    return PopupMenuButton<int>(
-      onSelected: (item) => viewModel.onSettingsClick(context, item),
-      itemBuilder: (context) => [
-        const PopupMenuItem(
-          value: 0,
-          child: Text("Valandų skirtumas"),
-        ),
-        const PopupMenuItem(
-          value: 1,
-          child: Text("Baigti"),
-        )
-      ],
-    );
-  }
-
-  Widget _buildBody() {
+  Widget _buildBody(BuildContext context) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(40),
         child: Column(
           children: [
-            _buildDropdownButton(viewModel.dropdownTitles[0]),
-            const SizedBox(
-              height: 50,
-            ),
-            _buildDropdownButton(viewModel.dropdownTitles[1]),
-            ValueListenableBuilder<String>(
-              valueListenable: viewModel.symbolSpeller,
-              builder: (context, value, child) {
-                if(value.isEmpty){
-                  return const Icon(Icons.cancel);
-                }
-                return Text(value);
-              },
-            ),
+            _buildOutputField(context),
+            SizedBox(height: 50,),
+            
+            _buildListenerForDateCompare(context),
+            SizedBox(height: 50,),
+
+            _buildListenerForRandomNum(context),
+            SizedBox(height: 50,),
+
+            _buildDateBtn(context),
+            SizedBox(height: 50,),
+
+            _buildStopRandomNumBtn(context),
+            SizedBox(height: 50,),
+
+            _buildStartRandomNumBtn(context),
+            SizedBox(height: 50,),
+            _buildStopAllBtn(context)
           ],
         ),
       ),
     );
   }
 
-  DropdownButton<String> _buildDropdownButton(String dropdownTitle) {
-    return DropdownButton<String>(
-      hint: Text(dropdownTitle, style: TextStyle(color: Colors.black)),
-      icon: null,
-      iconSize: 0.0,
-      elevation: 16,
-      style: const TextStyle(color: Colors.deepPurple),
-      underline: Container(
-        height: 2,
-        color: Colors.deepPurpleAccent,
-      ),
-      onChanged: (String? newValue) {
-        viewModel.onDropdownSelection(context, dropdownTitle, newValue!);
+  _buildStopAllBtn(BuildContext context) {
+    return TextButton(
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
+        ),
+        onPressed: () => viewModel.handleExit(),
+        child: Text("STOP"));
+  }
+
+  _buildStartRandomNumBtn(BuildContext context) {
+    return TextButton(
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
+        ),
+        onPressed: () => viewModel.runRandomNumEverySecond(false),
+        child: Text("Start random numbers"));
+  }
+
+  _buildStopRandomNumBtn(BuildContext context) {
+    return TextButton(
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
+        ),
+        onPressed: () => viewModel.stopRandomNumGen(),
+        child: Text("Stop random numbers"));
+  }
+
+  _buildDateBtn(BuildContext context) {
+    return TextButton(
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
+        ),
+        onPressed: () => viewModel.dateBtnClick(context),
+        child: Text("Select Date"));
+  }
+
+  Widget _buildOutputField(BuildContext context) {
+    return Text(viewModel.outputFieldText);
+  }
+
+  Widget _buildListenerForDateCompare(BuildContext context) {
+    return ValueListenableBuilder<String>(
+      valueListenable: viewModel.daysUntilSelectedDateText,
+      builder: (context, value, child) {
+        if(value.isEmpty){
+          return const Text("");
+        }
+        return Text(value);
       },
-      items: <String>[
-        viewModel.countSymbolsActionText,
-        viewModel.spellSymbolsActionText,
-      ].map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
+    );
+  }
+
+  Widget _buildListenerForRandomNum(BuildContext context) {
+    return ValueListenableBuilder<String>(
+      valueListenable: viewModel.randomNumber,
+      builder: (context, value, child) {
+        if(value.isEmpty){
+          return const Text("");
+        }
+        return Text(value);
+      },
     );
   }
 }

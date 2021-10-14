@@ -9,12 +9,13 @@ class TimeService {
   }
 
   static TimeOfDay getCurrentTime() => TimeOfDay.now();
-  
-  static Future<TimeOfDay?> timeSelector(BuildContext context) {
-    return showTimePicker(
+
+  static Future<DateTime?> timeSelector(BuildContext context) {
+    return showDatePicker(
       context: context,
-      initialTime: getCurrentTime(),
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2025),
     );
   }
-
 }
