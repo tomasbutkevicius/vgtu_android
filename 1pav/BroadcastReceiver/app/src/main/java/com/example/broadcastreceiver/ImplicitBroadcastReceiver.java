@@ -33,7 +33,6 @@ public class ImplicitBroadcastReceiver extends BroadcastReceiver {
             explicitIntent.putExtra("EXTRA", "Broadcast Receiver gavo intent " + intent.getStringExtra("KEY"));
 
             packageContext.sendBroadcast(explicitIntent);
-
         }
     }
 }
