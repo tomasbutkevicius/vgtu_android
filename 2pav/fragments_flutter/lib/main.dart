@@ -72,9 +72,9 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
           _tabController.animateTo(_currentIndex);
         },
         items: [
-          BottomNavigationBarItem(title: Text("Home"), icon: Icon(Icons.home)),
-          BottomNavigationBarItem(title: Text("Files"), icon: Icon(Icons.folder)),
-          BottomNavigationBarItem(title: Text("Settings"), icon: Icon(Icons.settings))
+          BottomNavigationBarItem(title: Text("Graph 1"), icon: Icon(Icons.calculate)),
+          BottomNavigationBarItem(title: Text("Graph 2"), icon: Icon(Icons.calculate)),
+          BottomNavigationBarItem(title: Text("Graph 3"), icon: Icon(Icons.calculate))
         ],
       ),
     );
