@@ -1,86 +1,60 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_app_9ld/models/response.dart';
+import 'package:flutter_app_9ld/services/api.dart';
+import 'package:flutter_app_9ld/services/local_notification.dart';
 import 'package:flutter_app_9ld/services/local_storage.dart';
 import 'package:flutter_app_9ld/services/state_manager.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
-import 'package:latlong2/latlong.dart';
-import 'package:positioned_tap_detector_2/positioned_tap_detector_2.dart';
 
 class HomeViewModel extends StateManager {
   final State _state;
-  late final LocalStorage _localStorage;  
-  final PopupController popupController = PopupController();
-  final MapController mapController = MapController();
-  
-  final String popupMessage = "Remove (2x tap)";
-  final String snackBarInformation = 'Long press on map to add marker\n'
-      'Press bottom button to save\n'
-      'Click on marker for more information';
-  final String infoBtnText = "info";
-
-
-  List<Marker> markers = [];
-  late int pointIndex;
-  LatLng centerPoint = LatLng(55.393086, 22.734465);
+  final LocalStorage _localStorage = LocalStorage();
+  final Api api = Api();
+  bool updateValueAvailable = false;
+  String remoteMp3Value = "";
 
   HomeViewModel(this._state) {
     _initializeHomeView();
   }
 
   Future _initializeHomeView() async {
-     _localStorage = LocalStorage();
-    pointIndex = 0;
-    centerPoint = await _localStorage.getCenterPoint();
-    mapController.move(centerPoint, 5);
-    markers =  await _localStorage.getMarkers();
+    String md5Saved = await _localStorage.getSavedMd5();
+
+    ResponseModel response = await api.fetch();
+    remoteMp3Value = response.md5;
+    print("remote md5:");
+    print(response.md5);
+     print("storage md5:");
+     print(md5Saved);
+    if(md5Saved == response.md5){
+      print("MD5 IS SAME");
+      updateValueAvailable = false;
+      rebuildWidget(_state);
+    } else {
+      print("MD5 IS DIFFERENT");
+      LocalNotifications localNotifications = LocalNotifications();
+      await localNotifications.notifyAboutValue();
+      updateValueAvailable = true;
+      rebuildWidget(_state);
+    }
+  }
+
+  notUpdateClick() {
+    updateValueAvailable = false;
     rebuildWidget(_state);
   }
 
-  onInfoClick(BuildContext context) {
-    final snackBar = SnackBar(content: Text(snackBarInformation));
 
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
-  onRefreshBtnClick() {
-    _localStorage.saveLocationPoints(markers);
+  updateClick() async {
+    updateValueAvailable = false;
+    await _localStorage.saveMd5(remoteMp3Value);
     rebuildWidget(_state);
   }
 
-  onPopupTap() {
-    debugPrint('Popup tap!');
-  }
-
-  onMapLongPress(TapPosition position, LatLng point) async {
-    print("VM: long press. Adding a marker...");
-    print(point);
-    centerPoint = point;
-    await _localStorage.saveCenterPoint(point);
-    Marker newMarker = Marker(
-      anchorPos: AnchorPos.align(AnchorAlign.center),
-      height: 30,
-      width: 30,
-      point: point,
-      builder: (ctx) => Icon(Icons.pin_drop),
-    );
-    markers.add(newMarker);
-
-    markers = List.from(markers);
-    rebuildWidget(_state);
-  }
-
-  onMapTap(TapPosition position, LatLng point) {
-    popupController.hidePopup();
-  }
-
-  onPopupDoubleTap(Marker marker) {
-    markers.removeWhere((element) => (element.point.latitude == marker.point.latitude && element.point.longitude == marker.point.longitude));
-
-    markers = List.from(markers);
-    popupController.hidePopup();
-
-    rebuildWidget(_state);
+  resetMd5() async {
+    remoteMp3Value = '';
+    await _localStorage.saveMd5('');
+    await _initializeHomeView();
   }
 
 }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app_9ld/services/local_notification.dart';
 import 'package:flutter_app_9ld/views/home/home_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  LocalNotifications.init();
   runApp(const MyApp());
 }
 

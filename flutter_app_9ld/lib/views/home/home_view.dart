@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app_9ld/views/home/home_viewmodel.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);
@@ -23,91 +21,50 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(context),
-      floatingActionButton: _buildBottomActionButtons(),
       body: _buildBody(),
     );
   }
 
-  FlutterMap _buildBody() {
-    return FlutterMap(
-      mapController: viewModel.mapController,
-      options: MapOptions(
-        center: viewModel.centerPoint,
-        zoom: 5,
-        maxZoom: 15,
-        plugins: [
-          MarkerClusterPlugin(),
-        ],
-        onTap: (position, point) => viewModel.onMapTap(position, point),
-        onLongPress: (position, point) => viewModel.onMapLongPress(position, point),
-      ),
-      layers: [
-        TileLayerOptions(
-          urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-          subdomains: ['a', 'b', 'c'],
+  Widget _buildBody() {
+    return Column(
+      children: [
+        Center(
+          child: Text("2 kd"),
         ),
-        MarkerClusterLayerOptions(
-          maxClusterRadius: 120,
-          size: Size(40, 40),
-          anchor: AnchorPos.align(AnchorAlign.center),
-          fitBoundsOptions: const FitBoundsOptions(
-            padding: EdgeInsets.all(50),
+        Center(
+          child: TextButton(
+            onPressed: () => viewModel.resetMd5(),
+            child: Text("Reset md5 value"),
           ),
-          markers: viewModel.markers,
-          polygonOptions: PolygonOptions(borderColor: Colors.blueAccent, color: Colors.black12, borderStrokeWidth: 3),
-          popupOptions: PopupOptions(
-              popupSnap: PopupSnap.markerTop,
-              popupController: viewModel.popupController,
-              popupBuilder: (_, marker) => Container(
-                    width: 150,
-                    height: 50,
-                    color: Colors.white,
-                    child: GestureDetector(
-                      onTap: () => viewModel.onPopupTap(),
-                      onDoubleTap: () => viewModel.onPopupDoubleTap(marker),
-                      child: TextButton(
-                        style: TextButton.styleFrom(
-                          primary: Colors.white,
-                          backgroundColor: Colors.teal,
-                          onSurface: Colors.grey,
-                        ),
-                        onPressed: () {},
-                        child: Text(viewModel.popupMessage),
-                      ),
-                    ),
-                  )),
-          builder: (context, markers) {
-            return FloatingActionButton(
-              onPressed: null,
-              child: Text(markers.length.toString()),
-            );
-          },
         ),
+        viewModel.updateValueAvailable ? _valueUpdateBtns() : Container(),
       ],
     );
   }
 
-  FloatingActionButton _buildBottomActionButtons() {
-    return FloatingActionButton(
-      onPressed: () => viewModel.onRefreshBtnClick(),
-      child: const Icon(Icons.save),
+  Widget _valueUpdateBtns() {
+    return Column(
+      children: [
+        Center(
+          child: TextButton(
+            onPressed: () => viewModel.updateClick(),
+            child: Text("Update data"),
+          ),
+        ),
+        Center(
+          child: TextButton(
+            onPressed: () => viewModel.notUpdateClick(),
+            child: Text("Don't update"),
+          ),
+        ),
+      ],
     );
   }
 
   AppBar _buildAppBar(BuildContext context) {
-    const TextStyle infoBtnTextStyle = TextStyle(color: Colors.white);
     return AppBar(
-      title: const Text("Personal Marker Map"),
+      title: const Text("Kontrolinis 2"),
       centerTitle: true,
-      actions: [
-        TextButton(
-          onPressed: () => viewModel.onInfoClick(context),
-          child: Text(
-            viewModel.infoBtnText,
-            style: infoBtnTextStyle,
-          ),
-        )
-      ],
     );
   }
 }

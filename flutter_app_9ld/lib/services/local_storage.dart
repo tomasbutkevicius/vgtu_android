@@ -7,91 +7,33 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:latlong2/latlong.dart';
 
 class LocalStorage {
-  static const _keyLocationPoints = 'locationPoints';
-  static const _keyCenterPoint = 'centerPoint';
+  static const _key = 'md5';
 
-  Future saveCenterPoint(LatLng point) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    print("DB: saving center point...");
-
-    Map<String, dynamic> jsonPoint = {
-      "latitude": point.latitude,
-      "longitude": point.longitude,
-    };
-
-    await prefs.setString(_keyCenterPoint, jsonEncode(jsonPoint));
-  }
-
-  Future<LatLng> getCenterPoint() async {
+  Future<String> getSavedMd5() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    String encodedPoint = prefs.getString(_keyCenterPoint) ?? "";
+    String md5 = prefs.getString(_key) ?? "";
 
-    if(encodedPoint.isEmpty){
-      print("DB: no center point found. Returning default");
+    if(md5.isEmpty){
+      print("md5 not found");
 
-      return LatLng(55.393086, 22.734465);
+      return "";
     }
 
-    print("DB: center point found:");
-    print(encodedPoint);
+    print("md5 found:");
+    print(md5);
 
-    Map<String, dynamic> jsonPoint = jsonDecode(encodedPoint);
 
-    return LatLng(jsonPoint["latitude"], jsonPoint['longitude']);
+    return md5;
   }
 
-  Future saveLocationPoints(List<Marker> markers) async {
+  Future saveMd5(String md5) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    print("DB: saving locations...");
+    print("DB: saving md5");
+    print(md5);
 
-    List<Map<String, dynamic>> jsonPoints = [];
 
-    markers.forEach((marker) {
-      jsonPoints.add({
-        "latitude": marker.point.latitude,
-        "longitude": marker.point.longitude,
-      });
-    });
-
-    await prefs.setString(_keyLocationPoints, jsonEncode(jsonPoints));
-
-    print("DB: saved locations:");
-    print(jsonPoints);
-  }
-
-  Future<List<Marker>> getMarkers() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    print("DB: gettings locations from storage...");
-
-    String encodedPoints = prefs.getString(_keyLocationPoints) ?? "";
-
-    if(encodedPoints.isEmpty){
-      print("DB: no locations found");
-
-      return [];
-    }
-
-    print("DB: found locations:");
-    print(encodedPoints);
-
-    List<dynamic> jsonPoints = jsonDecode(encodedPoints);
-
-    List<Marker> markerList = [];
-    jsonPoints.forEach((jsonPoint) {
-      markerList.add(
-          Marker(
-            anchorPos: AnchorPos.align(AnchorAlign.center),
-            height: 30,
-            width: 30,
-            point: LatLng(jsonPoint["latitude"], jsonPoint['longitude']),
-            builder: (ctx) => const Icon(Icons.pin_drop),
-          )
-      );
-    });
-
-    return markerList;
+    await prefs.setString(_key, md5);
   }
 
 }
