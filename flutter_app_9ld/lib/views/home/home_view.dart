@@ -34,7 +34,7 @@ class _HomeViewState extends State<HomeView> {
         Center(
           child: TextButton(
             onPressed: () => viewModel.resetMd5(),
-            child: Text("Reset md5 value"),
+            child: Text("Resend"),
           ),
         ),
         viewModel.updateValueAvailable ? _valueUpdateBtns() : Container(),

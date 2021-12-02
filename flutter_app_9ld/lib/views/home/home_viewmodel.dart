@@ -52,8 +52,6 @@ class HomeViewModel extends StateManager {
   }
 
   resetMd5() async {
-    remoteMp3Value = '';
-    await _localStorage.saveMd5('');
     await _initializeHomeView();
   }
 
